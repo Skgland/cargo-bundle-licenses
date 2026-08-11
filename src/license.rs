@@ -79,11 +79,17 @@ impl License {
     }
 }
 
+const EXTRA_LAX: ParseMode = {
+    let mut mode = ParseMode::LAX;
+    mode.allow_unknown = true;
+    mode
+};
+
 impl FromStr for License {
     type Err = core::convert::Infallible;
 
     fn from_str(s: &str) -> Result<License, core::convert::Infallible> {
-        match spdx::expression::Expression::parse_mode(s, ParseMode::LAX) {
+        match spdx::expression::Expression::parse_mode(s, EXTRA_LAX) {
             Ok(expr) => Ok(process_spdx_expression(expr)),
             Err(err) => {
                 log::warn!("Could not parse license expression `{s}`: {err}");
@@ -312,22 +318,24 @@ mod test {
         assert_eq!(
             License::from_str("DoesNotExist42 OR MIT"),
             Ok(License::Multiple(vec![
+                License::Custom("LicenseRef-DoesNotExist42".to_string()),
                 License::MIT,
-                License::Custom("DoesNotExist42".to_string()),
             ]))
         );
         assert_eq!(
             License::from_str("MIT OR DoesNotExist42 AND Apache-2.0"),
             Ok(License::Multiple(vec![
                 License::MIT,
-                License::Custom("DoesNotExist42 AND Apache-2.0".to_string()),
+                License::Custom("LicenseRef-DoesNotExist42".to_string()),
+                License::Apache_2_0
             ]))
         );
         assert_eq!(
             License::from_str("(DoesNotExist42 OR MIT) AND Apache-2.0"),
             Ok(License::Multiple(vec![
-                License::Custom("(DoesNotExist42".to_string()),
-                License::Custom("MIT) AND Apache-2.0".to_string()),
+                License::Custom("LicenseRef-DoesNotExist42".to_string()),
+                License::MIT,
+                License::Apache_2_0
             ]))
         );
         assert_eq!(
