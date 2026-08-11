@@ -4,6 +4,7 @@
 - chore: bump dependencies
   - now requires at least rust 1.88
   - toml 1.1.0 spec
+- chore: log a warning when parsing a license expression fails
 
 # v4.2.0
 

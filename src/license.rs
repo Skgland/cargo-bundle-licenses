@@ -83,10 +83,12 @@ impl FromStr for License {
     type Err = core::convert::Infallible;
 
     fn from_str(s: &str) -> Result<License, core::convert::Infallible> {
-        if let Ok(expr) = spdx::expression::Expression::parse_mode(s, ParseMode::LAX) {
-            Ok(process_spdx_expression(expr))
-        } else {
-            Ok(simple_license(s))
+        match spdx::expression::Expression::parse_mode(s, ParseMode::LAX) {
+            Ok(expr) => Ok(process_spdx_expression(expr)),
+            Err(err) => {
+                log::warn!("Could not parse license expression `{s}`: {err}");
+                Ok(simple_license(s))
+            }
         }
     }
 }
