@@ -1,6 +1,9 @@
 # v5.0.0
 
 - [feature](https://github.com/sstadick/cargo-bundle-licenses/issues/57): mark `License` struct as `non_exhaustive`
+- chore: bump dependencies
+  - now requires at least rust 1.88
+  - toml 1.1.0 spec
 
 # v4.2.0
 
