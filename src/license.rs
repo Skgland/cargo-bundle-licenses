@@ -308,6 +308,27 @@ mod test {
     #[test]
     fn complex_spdx() {
         assert_eq!(
+            License::from_str("DoesNotExist42 OR MIT"),
+            Ok(License::Multiple(vec![
+                License::MIT,
+                License::Custom("DoesNotExist42".to_string()),
+            ]))
+        );
+        assert_eq!(
+            License::from_str("MIT OR DoesNotExist42 AND Apache-2.0"),
+            Ok(License::Multiple(vec![
+                License::MIT,
+                License::Custom("DoesNotExist42 AND Apache-2.0".to_string()),
+            ]))
+        );
+        assert_eq!(
+            License::from_str("(DoesNotExist42 OR MIT) AND Apache-2.0"),
+            Ok(License::Multiple(vec![
+                License::Custom("(DoesNotExist42".to_string()),
+                License::Custom("MIT) AND Apache-2.0".to_string()),
+            ]))
+        );
+        assert_eq!(
             License::from_str("Apache-2.0 OR MIT"),
             Ok(License::Multiple(vec![License::Apache_2_0, License::MIT]))
         );
